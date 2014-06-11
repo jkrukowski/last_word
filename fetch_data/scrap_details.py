@@ -43,5 +43,5 @@ def parse_items():
 
 if __name__ == '__main__':
     items = parse_items()
-    pickle.dump(items, open('full_table.pkl', 'wb'))
+    pickle.dump(items, open('../data/full_table.pkl', 'wb'))
     print '--- end'

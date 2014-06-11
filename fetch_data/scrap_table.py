@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 BASE_URL = r'http://www.tdcj.state.tx.us/death_row/'
 HREFS_URL = r'http://www.tdcj.state.tx.us/death_row/dr_executed_offenders.html'
 DATE_FORMAT = '%m/%d/%Y'
-FILE_PATHS = ('/Users/micazook/Desktop/dr_info.html', '/Users/micazook/Desktop/dr_info2.html')
+FILE_PATHS = ('../data/dr_info.html', '../data/dr_info2.html')
 
 parse_map = {
     'lp': lambda x: int(x.get_text()),
