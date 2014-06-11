@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 BASE_URL = r'http://www.tdcj.state.tx.us/death_row/'
 HREFS_URL = r'http://www.tdcj.state.tx.us/death_row/dr_executed_offenders.html'
 DATE_FORMAT = '%m/%d/%Y'
-FILE_PATHS = ('../data/dr_info.html', '../data/dr_info2.html')
+FILE_PATHS = ('../fetched_data/dr_info.html', '../fetched_data/dr_info2.html')
 
 parse_map = {
     'lp': lambda x: int(x.get_text()),
@@ -65,4 +65,4 @@ def get_rows():
     return result
 
 if __name__ == '__main__':
-    pickle.dump(get_rows(), open('table.pkl', 'wb'))
+    pickle.dump(get_rows(), open('../fetched_data/table.pkl', 'wb'))

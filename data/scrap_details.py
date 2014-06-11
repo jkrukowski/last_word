@@ -26,7 +26,7 @@ def get_url_content(url):
 
 
 def get_table():
-    return pickle.load(open('../data/table.pkl'))
+    return pickle.load(open('../fetched_data/table.pkl'))
 
 
 def parse_items():
@@ -43,5 +43,5 @@ def parse_items():
 
 if __name__ == '__main__':
     items = parse_items()
-    pickle.dump(items, open('../data/full_table.pkl', 'wb'))
+    pickle.dump(items, open('../fetched_data/full_table.pkl', 'wb'))
     print '--- end'

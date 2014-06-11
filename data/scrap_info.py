@@ -30,5 +30,5 @@ def fetch_info(data):
 
 
 if __name__ == '__main__':
-    data = pickle.load(open('../data/full_table.pkl'))
+    data = pickle.load(open('../fetched_data/full_table.pkl'))
     fetch_info(data)
