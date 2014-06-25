@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import pickle
 import re
 from textblob import TextBlob
@@ -23,7 +22,7 @@ def get_stopwords():
     result = set()
     with open('../stopwords.txt', 'rb') as f:
         for line in f:
-            result.add(line.strip())
+            result.add(line.strip().decode('utf-8'))
     return result
 
 
@@ -37,10 +36,13 @@ def lemmatize(text):
     return TextBlob(text).words.lower().lemmatize()
 
 
-# clean and lemmatize
+swords = get_stopwords()
+
+# clean, lemmatize and remove stopwords
 df['clear_stm'] = df.stm.apply(clean_text)
 df.clear_stm.replace('[\w\W]+offender declined to make a last statement[\w\W]+', '', inplace=True, regex=True)
 df['text_blob'] = df.clear_stm.apply(lemmatize)
+df['text_blob'] = df.text_blob.apply(lambda x: [i for i in x if i not in swords])
 
 # make and save dictionary
 dictionary = corpora.Dictionary(df.text_blob)
