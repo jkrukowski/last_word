@@ -35,9 +35,6 @@ def clean_text(text):
 def lemmatize(text):
     return TextBlob(text).words.lower().lemmatize()
 
-
-
-
 # clean, lemmatize and remove stopwords
 df['clear_stm'] = df.stm.apply(clean_text)
 df.clear_stm.replace('[\w\W]+offender declined to make a last statement[\w\W]+', '', inplace=True, regex=True)
@@ -52,6 +49,11 @@ dictionary.filter_tokens(stop_ids + once_ids)
 dictionary.compactify()
 dictionary.save('../dictionary.dict')
 
-# add bow column
-df['bow'] = df.text_blob.apply(lambda x: dictionary.doc2bow(x))
+# add corpus column
+df['corpus'] = df.text_blob.apply(lambda x: dictionary.doc2bow(x))
+
+# add tfidf column
+tfidf = models.TfidfModel(df.corpus)
+df['tfidf'] = df.corpus.apply(lambda x: tfidf[x])
+
 df.to_pickle('../data.pkl')
