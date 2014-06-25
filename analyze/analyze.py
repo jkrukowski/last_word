@@ -36,16 +36,20 @@ def lemmatize(text):
     return TextBlob(text).words.lower().lemmatize()
 
 
-swords = get_stopwords()
+
 
 # clean, lemmatize and remove stopwords
 df['clear_stm'] = df.stm.apply(clean_text)
 df.clear_stm.replace('[\w\W]+offender declined to make a last statement[\w\W]+', '', inplace=True, regex=True)
 df['text_blob'] = df.clear_stm.apply(lemmatize)
-df['text_blob'] = df.text_blob.apply(lambda x: [i for i in x if i not in swords])
 
-# make and save dictionary
+# make, filter and save dictionary
+stopset = get_stopwords()
 dictionary = corpora.Dictionary(df.text_blob)
+stop_ids = [dictionary.token2id[stopword] for stopword in stopset if stopword in dictionary.token2id]
+once_ids = [tokenid for tokenid, docfreq in dictionary.dfs.iteritems() if docfreq == 1]
+dictionary.filter_tokens(stop_ids + once_ids)
+dictionary.compactify()
 dictionary.save('../dictionary.dict')
 
 # add bow column
