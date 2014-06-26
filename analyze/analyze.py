@@ -57,4 +57,8 @@ df['corpus'] = df.text_blob.apply(lambda x: dictionary.doc2bow(x))
 tfidf = models.TfidfModel(df.corpus)
 df['tfidf'] = df.corpus.apply(lambda x: tfidf[x])
 
+# add lsi column
+lsi = models.LsiModel(df.tfidf, id2word=dictionary, num_topics=100)
+df['lsi'] = df.tfidf.apply(lambda x: lsi[x])
+
 df.to_pickle('../data.pkl')
