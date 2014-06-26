@@ -1,4 +1,5 @@
 import wordcloud
+import os
 from gensim import corpora
 
 
@@ -9,6 +10,8 @@ def make_words(dictionary):
     return result
 
 wordcloud.FONT_PATH = 'C:/Windows/Fonts/DroidSansMono.ttf'
+if os.name == 'posix':
+    wordcloud.FONT_PATH = '/Users/micazook/Library/Fonts/DroidSansMono.ttf'
 dictionary = corpora.Dictionary.load('../dictionary.dict')
 words = make_words(dictionary)
 elements = wordcloud.fit_words(words, width=500, height=500)

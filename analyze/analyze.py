@@ -2,6 +2,7 @@ import pandas as pd
 import pickle
 import re
 from textblob import TextBlob
+import nltk.tokenize
 from gensim import corpora, models, similarities
 
 DATA_PATH = '../fetched_data/full_table.pkl'
