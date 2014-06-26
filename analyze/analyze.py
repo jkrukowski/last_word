@@ -60,5 +60,8 @@ df['tfidf'] = df.corpus.apply(lambda x: tfidf[x])
 # add lsi column
 lsi = models.LsiModel(df.tfidf, id2word=dictionary, num_topics=100)
 df['lsi'] = df.tfidf.apply(lambda x: lsi[x])
+index = similarities.MatrixSimilarity(df.lsi)
+lsi.save('../lsi.model')
+index.save('../lsi.matrix')
 
 df.to_pickle('../data.pkl')
