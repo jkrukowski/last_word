@@ -21,6 +21,10 @@ app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 
 def load_data():
+    """
+    Loads dictionary, matrix and model to process data
+    :return: namedtuple with dictionary, matrix and model
+    """
     dictionary = corpora.Dictionary.load(app.config['DICTIONARY'])
     matrix = similarities.MatrixSimilarity.load(app.config['MATRIX'])
     model = models.LsiModel.load(app.config['MODEL'])
@@ -28,24 +32,41 @@ def load_data():
 
 
 def get_data():
+    """
+    Attaches dictionary, matrix and model to global app state
+    :return: namedtuple with dictionary, matrix and model
+    """
     if not hasattr(g, 'data'):
         g.data = load_data()
     return g.data
 
 
 def parse_input(input_data, dictionary, model):
+    """
+    Parses and transforms user input
+    :param input_data: raw text user input
+    :param dictionary: gensim dictionary created from corpus
+    :param model: gensim lsi model
+    :return: user input tranfsormed by gensim model
+    """
     vec_text = TextBlob(input_data).words.lower().lemmatize()
     vec_bow = dictionary.doc2bow(vec_text)
     return model[vec_bow]
 
 
 def get_similar(vec_model, matrix):
+    """
+    Get similar documents
+    :param vec_model: user input tranfsormed by gensim model
+    :param matrix: gensim similarity matrix
+    :return: sorted list of similar documents
+    """
     sims = matrix[vec_model]
     result = [[index, float(item)] for index, item in enumerate(sims)]
     return sorted(result, key=lambda x: -x[1])
 
 
-@app.route('/query')
+@app.route('/')
 def user_query():
     data = get_data()
     user_input = request.args.get('q')
