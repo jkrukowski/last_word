@@ -66,6 +66,11 @@ def get_similar(vec_model, matrix):
     return sorted(result, key=lambda x: -x[1])
 
 
+@app.errorhandler(404)
+def page_not_found(error):
+    return jsonify({'status': 1, 'description': error.description})
+
+
 @app.route('/')
 def user_query():
     data = get_data()
