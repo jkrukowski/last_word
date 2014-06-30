@@ -5,8 +5,8 @@
     <title>Last Word</title>
 </head>
 <body>
-<form action="/query" method="get">
-  First name: <input type="text" name="q"><br>
+<form action="{{ url_for('user_query') }}" method="get">
+  Query: <input type="text" name="q"><br>
   <input type="submit" value="Submit">
 </form>
 </body>

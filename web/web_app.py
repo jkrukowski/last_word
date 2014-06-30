@@ -2,11 +2,12 @@ import os
 from collections import namedtuple
 from gensim import corpora, models, similarities
 from textblob import TextBlob
+import pandas as pd
 from flask import Flask, request, g, flash, jsonify, render_template
 
 app = Flask(__name__)
 app.config.from_object(__name__)
-Data = namedtuple('Data', 'matrix model dictionary')
+Data = namedtuple('Data', 'matrix model dictionary data_frame')
 
 app.config.update(dict(
     DEBUG=True,
@@ -15,6 +16,7 @@ app.config.update(dict(
     PASSWORD='default',
     MATRIX=os.path.join(app.root_path, 'data/lsi.matrix'),
     MODEL=os.path.join(app.root_path, 'data/lsi.model'),
+    DATA_FRAME=os.path.join(app.root_path, 'data/data.pkl'),
     DICTIONARY=os.path.join(app.root_path, 'data/dictionary.dict')
 ))
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
@@ -23,22 +25,27 @@ app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 def load_data():
     """
     Loads dictionary, matrix and model to process data
-    :return: namedtuple with dictionary, matrix and model
+    :return: namedtuple with dictionary, matrix, model and data frame
     """
     dictionary = corpora.Dictionary.load(app.config['DICTIONARY'])
     matrix = similarities.MatrixSimilarity.load(app.config['MATRIX'])
     model = models.LsiModel.load(app.config['MODEL'])
-    return Data(matrix=matrix, model=model, dictionary=dictionary)
+    df = pd.read_pickle(app.config['DATA_FRAME'])
+    return Data(matrix=matrix, model=model, dictionary=dictionary, data_frame=df)
 
 
 def get_data():
     """
-    Attaches dictionary, matrix and model to global app state
+    Attaches dictionary, matrix, model and data frame to global app state
     :return: namedtuple with dictionary, matrix and model
     """
     if not hasattr(g, 'data'):
         g.data = load_data()
     return g.data
+
+
+def get_record(index, df):
+    return df.loc[index].to_dict()
 
 
 def parse_input(input_data, dictionary, model):
@@ -54,7 +61,7 @@ def parse_input(input_data, dictionary, model):
     return model[vec_bow]
 
 
-def get_similar(vec_model, matrix):
+def get_similar(vec_model, matrix, df):
     """
     Get similar documents
     :param vec_model: user input tranfsormed by gensim model
@@ -62,7 +69,7 @@ def get_similar(vec_model, matrix):
     :return: sorted list of similar documents
     """
     sims = matrix[vec_model]
-    result = [{'index': index, 'value': float(item)} for index, item in enumerate(sims)]
+    result = [{'index': index, 'value': float(item), 'data': get_record(index, df)} for index, item in enumerate(sims)]
     return sorted(result, key=lambda x: -x['value'])
 
 
@@ -76,9 +83,9 @@ def user_query():
     data = get_data()
     user_input = request.args.get('q')
     vec_parsed = parse_input(user_input, data.dictionary, data.model)
-    result = get_similar(vec_parsed, data.matrix)
+    result = get_similar(vec_parsed, data.matrix, data.data_frame)
     flash('successful query')
-    return jsonify({'status': 0, 'result': result})
+    return render_template('details.html', result=result)
 
 
 @app.route('/')
