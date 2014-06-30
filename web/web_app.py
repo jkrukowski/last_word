@@ -2,7 +2,7 @@ import os
 from collections import namedtuple
 from gensim import corpora, models, similarities
 from textblob import TextBlob
-from flask import Flask, request, g, flash, jsonify
+from flask import Flask, request, g, flash, jsonify, render_template
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -62,8 +62,8 @@ def get_similar(vec_model, matrix):
     :return: sorted list of similar documents
     """
     sims = matrix[vec_model]
-    result = [[index, float(item)] for index, item in enumerate(sims)]
-    return sorted(result, key=lambda x: -x[1])
+    result = [{'index': index, 'value': float(item)} for index, item in enumerate(sims)]
+    return sorted(result, key=lambda x: -x['value'])
 
 
 @app.errorhandler(404)
@@ -71,7 +71,7 @@ def page_not_found(error):
     return jsonify({'status': 1, 'description': error.description})
 
 
-@app.route('/')
+@app.route('/query')
 def user_query():
     data = get_data()
     user_input = request.args.get('q')
@@ -80,6 +80,10 @@ def user_query():
     flash('successful query')
     return jsonify({'status': 0, 'result': result})
 
+
+@app.route('/')
+def main_page():
+    return render_template('main.html')
 
 if __name__ == '__main__':
     app.run()
